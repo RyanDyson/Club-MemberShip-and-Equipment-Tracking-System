@@ -1,0 +1,1 @@
+public class ExBorrowRequestPeriodOverlaps extends Exception {}
