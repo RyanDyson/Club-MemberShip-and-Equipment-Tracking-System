@@ -5,7 +5,7 @@ public abstract class RecordedCommand implements Command{
     public static ArrayList<RecordedCommand> redoList = new ArrayList<RecordedCommand>();
 
     @Override
-    public void execute(String[] cmdParts) throws ExInsufficientArgument, ExMemberIdInUse, ExInvalidDateFormat, ExBorrowRequestPeriodOverlaps, ExEquipmentAlreadyBorrowed, ExEquipmentCodeInUse, ExEquipmentNotFound, ExMemberNotFound, ExNumberOfDaysLessThanOne{};
+    public void execute(String[] cmdParts) throws ExInsufficientArgument, ExMemberIdInUse, ExInvalidDateFormat, ExBorrowRequestPeriodOverlaps, ExEquipmentSetAlreadyBorrowed, ExEquipmentCodeInUse, ExEquipmentNotFound, ExMemberNotFound, ExNumberOfDaysLessThanOne, ExMemberAlreadyBorrowedSet{};
 
     public abstract void undoMe();
     public abstract void redoMe();

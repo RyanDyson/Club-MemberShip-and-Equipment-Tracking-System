@@ -9,7 +9,8 @@ public class SystemDate extends Day {
         return instance;
     }
 
-    public static void createTheInstance(String sDay) throws ExInvalidDateFormat {        if (instance == null) {
+    public static void createTheInstance(String sDay) throws ExInvalidDateFormat {        
+        if (instance == null) {
             instance = new SystemDate(sDay);
             return;
         }

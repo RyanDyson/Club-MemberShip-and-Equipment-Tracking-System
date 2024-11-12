@@ -32,7 +32,7 @@ public class CmdStartNewDay extends RecordedCommand{
             } 
             catch (ExInvalidDateFormat e) {
                 System.out.println(e.getMessage());
-            }
+            } 
         }
     }
 

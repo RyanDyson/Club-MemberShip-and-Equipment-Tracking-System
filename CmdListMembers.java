@@ -1,8 +1,8 @@
 public class CmdListMembers implements Command{
-    private Club myClub = Club.getInstance();
 
     @Override
     public void execute(String[] cmdParts) {
+        Club myClub = Club.getInstance();
         myClub.listClubMembers();
     }
 }

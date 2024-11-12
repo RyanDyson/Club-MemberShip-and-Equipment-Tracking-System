@@ -1,50 +1,59 @@
 public class CmdBorrow extends RecordedCommand {
-    private Equipment equipment;
+    private EquipmentSet equipmentSet;
     private Member borrower;
     private String[] cmdParts;
 
     @Override
-    public void execute(String args[]) throws ExInsufficientArgument{
+    public void execute(String args[]) throws ExInsufficientArgument, ExMemberNotFound, ExMemberNotFound, ExEquipmentNotFound, ExEquipmentSetAlreadyBorrowed, ExMemberAlreadyBorrowedSet{
         cmdParts = args;
         if (cmdParts.length < 3) {
             throw new ExInsufficientArgument();
         }
         String borrowerId = cmdParts[1];
-
         Club myClub = Club.getInstance();
-        try {
-          borrower = myClub.findMember(borrowerId);
-        }
-        catch (ExMemberNotFound e) {
-          System.out.println(e.getMessage());
-        }
-        finally {if (borrower != null) {
-          equipment = myClub.borrowEquipment(cmdParts, borrower);
-          if (equipment != null) {
+        Equipment equipment = null;
+
+        borrower = myClub.findMember(borrowerId);
+        equipment = myClub.findEquipment(cmdParts[2]);
+      
+        if (borrower != null) {
+          equipmentSet = myClub.borrowEquipment(cmdParts, borrower);
+          if (equipmentSet != null && equipment != null) {
               borrower.borrowEquipmentSet();
-              System.out.println("Done.");
               addUndoCommand(this);
               clearRedoList();
+              System.out.println(borrower.toString() + " borrows " + equipmentSet.toString() + " (" + equipment.getName() + ") for " + SystemDate.getInstance().clone().toString() + " to " + equipmentSet.getReturnDate().toString());
+              System.out.println("Done.");
           }
-        } 
-      }    
+        }    
     }
 
     @Override
     public void undoMe() {
-        if (equipment != null) {
+        if (equipmentSet != null) {
           borrower.returnEquipmentSet();
-          equipment.returnEquipmentSet(borrower);
+          equipmentSet.returnSet();
           addRedoCommand(this);
         }
     }
 
     @Override
     public void redoMe() {
-        if (equipment != null) { 
+        if (equipmentSet != null) { 
           borrower.borrowEquipmentSet();
           Club myClub = Club.getInstance();
-          myClub.borrowEquipment(cmdParts, borrower);
+          try {
+            myClub.borrowEquipment(cmdParts, borrower);
+          }
+          catch (ExEquipmentNotFound e) {
+            System.out.println(e.getMessage());
+          }
+          catch (ExEquipmentSetAlreadyBorrowed e) {
+            System.out.println(e.getMessage());
+          }
+          catch (ExMemberAlreadyBorrowedSet e) {
+            System.out.println(e.getMessage());
+          }
           addUndoCommand(this);
         }
     }

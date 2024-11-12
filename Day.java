@@ -19,13 +19,13 @@ public class Day implements Cloneable, Comparable<Day>{
 
 	@Override
 	public int compareTo(Day anotherDay) {
-		if (year < anotherDay.year) return -1;
-		else if (month < anotherDay.month) return -1;
-		else if (day < anotherDay.day) return -1;
-		else if (year > anotherDay.year) return 1;
-		else if (month > anotherDay.month) return 1;
-		else if (day > anotherDay.day) return 1;
-		else return 0;
+        if (year < anotherDay.year) return -1;
+        else if (year > anotherDay.year) return 1;
+        else if (month < anotherDay.month) return -1;
+        else if (month > anotherDay.month) return 1;
+        else if (day < anotherDay.day) return -1;
+        else if (day > anotherDay.day) return 1;
+        else return 0;
 	}
 	
     @Override
@@ -75,17 +75,26 @@ public class Day implements Cloneable, Comparable<Day>{
 	}
 
     public void set(String sDay) throws ExInvalidDateFormat {
+		String[] sDayParts = sDay.split("-");
+
+		if (sDayParts.length < 3) {
+			throw new ExInvalidDateFormat();
+		}
 		try {
-			String[] sDayParts = sDay.split("-");
 			this.day = Integer.parseInt(sDayParts[0]); //Apply Integer.parseInt for sDayParts[0];
 			this.year = Integer.parseInt(sDayParts[2]);
 			this.month = monthNames.indexOf(sDayParts[1])/3+1;
 
+			String correctMonthName = monthNames.substring((month-1)*3, (month)*3);
+
 			if (!valid(year, month, day)) {
 				throw new ExInvalidDateFormat();
 			}
+			if (!sDayParts[1].equals(correctMonthName)) {
+				throw new ExInvalidDateFormat();
+			}
 		}
-		catch (Exception e) {
+		catch (NumberFormatException e) {
 			throw new ExInvalidDateFormat();
 		}
     }

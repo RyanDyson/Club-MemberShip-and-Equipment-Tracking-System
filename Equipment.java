@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class Equipment {
+public class Equipment implements Comparable<Equipment> {
     private String equipmentCode;
     private String name;
     private ArrayList<EquipmentSet> equipmentSet;
@@ -12,19 +12,33 @@ public class Equipment {
         Club.getInstance().addEquipment(this);
     }
 
-    public void borrowEquipmentSets(String[] args, Member borrower) {
+    public EquipmentSet borrowEquipmentSets(String[] args, Member borrower) throws ExEquipmentSetAlreadyBorrowed, ExMemberAlreadyBorrowedSet {
+        for (EquipmentSet e: equipmentSet) {
+            if (!e.isAvailable()) {
+                if (e.getBorrower().equals(borrower)) {
+                    throw new ExMemberAlreadyBorrowedSet();
+                }
+            }
+        }
         int borrowDays = (args.length >= 4) ? Integer.parseInt(args[3]) : 7;
 
         Day returnDate = SystemDate.getInstance().clone();
+        EquipmentSet borrowedset = null;
         returnDate.addDays(borrowDays);
 
         for (EquipmentSet e: equipmentSet) {
             if (e.isAvailable()) {
                 e.borrowSet(borrower, returnDate);
+                borrowedset = e;
+                break;
             }
         }
 
-        System.out.println(borrower.toString() + " borrows " + equipmentCode + "(" + name + ") for " + SystemDate.getInstance().clone().toString() + " to " + returnDate.toString());
+        if (borrowedset != null) {
+            Collections.sort(equipmentSet);
+            return borrowedset;
+        }
+        throw new ExEquipmentSetAlreadyBorrowed();
     }
 
     public static void listEquipment(ArrayList<Equipment> allEquipments) {
@@ -39,16 +53,17 @@ public class Equipment {
     private String getBorrowedSets() {
         StringBuilder sb = new StringBuilder();
 
-        int i=0;
-        for (EquipmentSet e: this.equipmentSet) {
+        int i = 0;
+        for (EquipmentSet e : this.equipmentSet) {
             if (!e.isAvailable()) {
                 if (i > 0) {
                     sb.append(", ");
                 }
-                sb.append(String.format("%s(%s)", e.getCode(), e.getBorrower().getMemberId()));
+                sb.append(String.format("%s(%s)", e.toString(), e.getBorrower().getMemberId()));
+                i++;
             }
-            i++;
         }
+
         return sb.toString();
     }
 
@@ -87,10 +102,40 @@ public class Equipment {
     }
 
     public void returnEquipmentSet(Member m) {
-        for (EquipmentSet e: equipmentSet) {
-            if (e.getBorrower().equals(m)) {
+        for (EquipmentSet e : equipmentSet) {
+            if (e.getBorrower() != null && e.getBorrower().equals(m)) {
                 e.returnSet();
             }
         }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public int compareTo(Equipment another) {
+        return this.equipmentCode.compareTo(another.equipmentCode);
+    }
+
+    public void currentEquipmentStatus() {
+        System.out.println("[" + this.toString(false) + "]");
+        if (equipmentSet.isEmpty()) {
+            System.out.println("  We do not have any sets for this equipment.");
+            return;
+        }
+        for (EquipmentSet e : equipmentSet) {
+            System.out.print("  ");
+            e.currentEquipmentStatus();
+        }
+    }
+
+    public EquipmentSet getBorrowedSetByMember(Member m) {
+        for (EquipmentSet e : equipmentSet) {
+            if (!e.isAvailable() && e.getBorrower().equals(m)) {
+                return e;
+            }
+        }
+        return null; // Return null if no borrowed set is found
     }
 }

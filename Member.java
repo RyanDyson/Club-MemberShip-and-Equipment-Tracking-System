@@ -51,4 +51,13 @@ public class Member implements Comparable<Member>{
     public void returnEquipmentSet() {
         numBorrowed--;
     }
+
+    public int numOfBorrowed() {
+        return numBorrowed;
+    }
+
+    public void currentMemberStatus() {
+        System.out.println("["+ this.toString() +"]");
+        Club.getInstance().printBorrowedEquipmentSetByMember(this);
+    }
 }

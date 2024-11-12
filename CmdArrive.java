@@ -8,19 +8,22 @@ public class CmdArrive extends RecordedCommand {
         }
 
         String equipmentCode = cmdParts[1];
-        Equipment e = Club.getInstance().findEquipment(equipmentCode);
+        Equipment e;
+        try {
+            e = Club.getInstance().findEquipment(equipmentCode);
+        }
+        catch (ExEquipmentNotFound e1) {
+            throw new ExEquipmentNotFound("Missing record for Equipment "+ equipmentCode + ".  Cannot mark this item arrival.");
+        }
 
         if (e != null) {
             String arrivedsetCode = cmdParts[1];
             int numset = e.size();
             arrivedSet = new EquipmentSet(arrivedsetCode, numset);
             e.addEquipmentSet(arrivedSet);
-            System.out.println("Done");
+            System.out.println("Done.");
             addUndoCommand(this);
             clearRedoList();
-        }
-        else {
-            throw new ExEquipmentNotFound("Missing record for Equipment "+ equipmentCode + ".  Cannot mark this item arrival.");
         }
     }
 

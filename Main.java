@@ -43,15 +43,22 @@ public class Main {
 						(new CmdArrive()).execute(cmdParts);
 					else if (cmdParts[0].equals("borrow")) 
 						(new CmdBorrow()).execute(cmdParts);
-						else if (cmdParts[0].equals("undo"))
+					else if (cmdParts[0].equals("listEquipment"))
+						(new CmdListEquipment()).execute(cmdParts);
+					else if (cmdParts[0].equals("listMemberStatus"))
+						(new CmdListMemberStatus()).execute(cmdParts);	
+					else if (cmdParts[0].equals("listEquipmentStatus"))
+						(new CmdListEquipmentStatus()).execute(cmdParts);
+					else if (cmdParts[0].equals("undo"))
 						RecordedCommand.undoOneCommand();
 					else if (cmdParts[0].equals("redo"))
 						RecordedCommand.redoOneCommand();
-					else if (cmdParts[0].equals("listEquipment"))
-						(new CmdListEquipment()).execute(cmdParts);
 					else {
 						throw new ExUnknownCommand();
 					}
+				}
+				catch (ExInsufficientArgument e) {
+					System.out.println(e.getMessage());
 				}
 				catch (ExEquipmentNotFound e) {
 					System.out.println(e.getMessage());
@@ -62,14 +69,21 @@ public class Main {
 				catch (ExInvalidDateFormat e) {
 					System.out.println(e.getMessage());
 				}
-				catch (ExInsufficientArgument e) {
+				catch (ExEquipmentCodeInUse e) {
+					System.out.println(e.getMessage());
+				}
+				catch (ExMemberNotFound e) {
+					System.out.println(e.getMessage());
+				}
+				catch (ExEquipmentSetAlreadyBorrowed e) {
+					System.out.println(e.getMessage());
+				}
+				catch (ExMemberAlreadyBorrowedSet e) {
 					System.out.println(e.getMessage());
 				}
 				catch (ExUnknownCommand e) {
 					System.out.println(e.getMessage());
-				}
-				catch (ExEquipmentCodeInUse e) {
-					System.out.println(e.getMessage());
+					System.exit(0);
 				}
 				finally {}
 			}

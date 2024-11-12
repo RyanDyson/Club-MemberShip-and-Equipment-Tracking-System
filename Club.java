@@ -18,10 +18,10 @@ public class Club {
 
     public void addMember(Member newMember) {
         allMembers.add(newMember);
-        Collections.sort(allMembers);
     }
 
     public void listClubMembers() {
+        Collections.sort(allMembers);
         Member.list(allMembers);
     }
 
@@ -46,6 +46,7 @@ public class Club {
     }
 
     public void listEquipment() {
+        Collections.sort(allEquipment);
         Equipment.listEquipment(allEquipment);
     }
 
@@ -53,15 +54,37 @@ public class Club {
         return Equipment.getEquipmentById(equipmentId, allEquipment);
     }
 
-    public Equipment borrowEquipment(String[] args, Member borrower) {
-        try {
-            Equipment e = findEquipment(args[2]);
-            e.borrowEquipmentSets(args, borrower);
-            return e;
+    public EquipmentSet borrowEquipment(String[] args, Member borrower) throws ExEquipmentNotFound, ExEquipmentSetAlreadyBorrowed, ExMemberAlreadyBorrowedSet {
+        Equipment e = findEquipment(args[2]);
+        EquipmentSet borrowedSet = e.borrowEquipmentSets(args, borrower);
+        return borrowedSet;
+    }
+
+    public void listMemberStatus() {
+        for (Member m: allMembers) {
+            m.currentMemberStatus();
+            System.out.println();
         }
-        catch (ExEquipmentNotFound e) {
-            System.out.println(e.getMessage());
+    }
+
+    public void listEquipmentStatus() {
+        for (Equipment e : allEquipment) {
+            e.currentEquipmentStatus();
+            System.out.println();
         }
-        return null;
+    }
+
+    public void printBorrowedEquipmentSetByMember(Member m) {
+        boolean haveBorrowed = false;
+        for (Equipment e: allEquipment) {
+            EquipmentSet es = e.getBorrowedSetByMember(m);
+            if (es != null) {
+                haveBorrowed = true;
+                System.out.println("- borrows " + es.toString() + " (" + e.getName() + ") for " + SystemDate.getInstance().clone().toString() + " to " + es.getReturnDate().toString());
+            }
+        }
+        if (!haveBorrowed) {
+            System.out.println("No record.");
+        }
     }
 }

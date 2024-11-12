@@ -1,3 +1,3 @@
 public interface Command {
-    public void execute(String[] cmdParts) throws ExInsufficientArgument, ExMemberIdInUse, ExInvalidDateFormat, ExBorrowRequestPeriodOverlaps, ExEquipmentAlreadyBorrowed, ExEquipmentCodeInUse, ExEquipmentNotFound, ExMemberNotFound, ExNumberOfDaysLessThanOne;
+    public void execute(String[] cmdParts) throws ExInsufficientArgument, ExMemberIdInUse, ExInvalidDateFormat, ExBorrowRequestPeriodOverlaps, ExEquipmentSetAlreadyBorrowed, ExEquipmentCodeInUse, ExEquipmentNotFound, ExMemberNotFound, ExNumberOfDaysLessThanOne, ExMemberAlreadyBorrowedSet;
 }
