@@ -58,6 +58,24 @@ public class Member implements Comparable<Member>{
 
     public void currentMemberStatus() {
         System.out.println("["+ this.toString() +"]");
-        Club.getInstance().printBorrowedEquipmentSetByMember(this);
+        Club myClub = Club.getInstance();
+        boolean hasRecord = false;
+        hasRecord = myClub.printBorrowedEquipmentSetByMember(this);
+
+        boolean temp = false;
+        temp = myClub.printRequestedEquipmentByMember(this);
+        hasRecord = hasRecord || temp;
+        
+        if (!hasRecord) {
+            System.out.println("No record.");
+        }
+    }
+
+    public void requestEquipmentSet() {
+        numRequested++;
+    }
+
+    public void cancelRequest() {
+        numRequested--;
     }
 }

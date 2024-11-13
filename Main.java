@@ -49,6 +49,8 @@ public class Main {
 						(new CmdListMemberStatus()).execute(cmdParts);	
 					else if (cmdParts[0].equals("listEquipmentStatus"))
 						(new CmdListEquipmentStatus()).execute(cmdParts);
+					else if (cmdParts[0].equals("request"))
+						(new CmdRequest()).execute(cmdParts);
 					else if (cmdParts[0].equals("undo"))
 						RecordedCommand.undoOneCommand();
 					else if (cmdParts[0].equals("redo"))
@@ -56,6 +58,9 @@ public class Main {
 					else {
 						throw new ExUnknownCommand();
 					}
+				}
+				catch (ExBorrowRequestPeriodOverlaps e) {
+					System.out.println(e.getMessage());
 				}
 				catch (ExInsufficientArgument e) {
 					System.out.println(e.getMessage());
@@ -79,6 +84,9 @@ public class Main {
 					System.out.println(e.getMessage());
 				}
 				catch (ExMemberAlreadyBorrowedSet e) {
+					System.out.println(e.getMessage());
+				}
+				catch (ExNumberOfDaysLessThanOne e) {
 					System.out.println(e.getMessage());
 				}
 				catch (ExUnknownCommand e) {

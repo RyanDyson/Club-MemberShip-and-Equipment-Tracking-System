@@ -12,7 +12,7 @@ public class Equipment implements Comparable<Equipment> {
         Club.getInstance().addEquipment(this);
     }
 
-    public EquipmentSet borrowEquipmentSets(String[] args, Member borrower) throws ExEquipmentSetAlreadyBorrowed, ExMemberAlreadyBorrowedSet {
+    public EquipmentSet borrowEquipmentSets(String[] args, Member borrower) throws ExEquipmentSetAlreadyBorrowed, ExMemberAlreadyBorrowedSet, ExBorrowRequestPeriodOverlaps{
         for (EquipmentSet e: equipmentSet) {
             if (!e.isAvailable()) {
                 if (e.getBorrower().equals(borrower)) {
@@ -28,9 +28,15 @@ public class Equipment implements Comparable<Equipment> {
 
         for (EquipmentSet e: equipmentSet) {
             if (e.isAvailable()) {
+                try {
                 e.borrowSet(borrower, returnDate);
                 borrowedset = e;
                 break;
+                }
+                catch (ExBorrowRequestPeriodOverlaps e1) {
+                    System.out.println(e1.getMessage());
+                    return null;
+                }
             }
         }
 
@@ -137,5 +143,46 @@ public class Equipment implements Comparable<Equipment> {
             }
         }
         return null; // Return null if no borrowed set is found
+    }
+
+    public EquipmentSet requestSet(Member requester, Day start, Day end) throws ExBorrowRequestPeriodOverlaps, ExEquipmentSetAlreadyBorrowed {
+        for (EquipmentSet e : equipmentSet) {
+            for (RequestPeriod request : e.getAllRequests()) {
+                if (request.requester.equals(requester) &&
+                    ((start.compareTo(request.start) >= 0 && start.compareTo(request.end) <= 0) ||
+                     (end.compareTo(request.start) >= 0 && end.compareTo(request.end) <= 0) ||
+                     (start.compareTo(request.start) <= 0 && end.compareTo(request.end) >= 0))) {
+                    throw new ExBorrowRequestPeriodOverlaps("The period overlaps with a current period that the member borrows / requests the equipment.");
+                }
+            }
+        }
+
+        EquipmentSet requestedSet = null;
+        for (EquipmentSet e : equipmentSet) {
+            if (e.isAvailable(start, end)) {
+                e.requestSet(requester, start, end, this);
+                requestedSet = e;
+                break;
+            }
+        }
+
+        if (requestedSet == null) {
+            throw new ExEquipmentSetAlreadyBorrowed("There is no available set of this equipment for the command.");
+        }
+
+        return requestedSet;
+    }
+
+    public ArrayList<RequestPeriod> printRequestedSetByMember(Member requester) {
+        ArrayList<RequestPeriod> allRequestsByMember = new ArrayList<RequestPeriod>();
+
+        for (EquipmentSet e: equipmentSet) {
+            ArrayList<RequestPeriod> requests = e.getRequestsByMember(requester);
+            if (requests.size() > 0) {
+                allRequestsByMember.addAll(requests);
+            }
+        }
+
+        return allRequestsByMember;
     }
 }

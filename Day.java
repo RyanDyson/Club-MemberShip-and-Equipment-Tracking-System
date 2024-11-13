@@ -19,6 +19,9 @@ public class Day implements Cloneable, Comparable<Day>{
 
 	@Override
 	public int compareTo(Day anotherDay) {
+		if (anotherDay == null) {
+			return 0;
+		}
         if (year < anotherDay.year) return -1;
         else if (year > anotherDay.year) return 1;
         else if (month < anotherDay.month) return -1;
@@ -112,14 +115,36 @@ public class Day implements Cloneable, Comparable<Day>{
 	}
 
 	public void addDays(int n) {
-		if (valid(year, month, day+n)) {
-			day += n;
-			return;
-		}
-		else if (isEndOfMonth()) {
-			day = n - (month==2 && isLeapYear(year) ? 29 : 28);
-			month ++;
-			year = isEndOfYear() ? year + 1 : year;
-		}
-	}
+        while (n > 0) {
+            int daysInMonth = daysInMonth(year, month);
+            if (day + n <= daysInMonth) {
+                day += n;
+                n = 0;
+            } else {
+                n -= (daysInMonth - day + 1);
+                day = 1;
+                month++;
+                if (month > 12) {
+                    month = 1;
+                    year++;
+                }
+            }
+        }
+    }
+
+	private int daysInMonth(int year, int month) {
+        switch (month) {
+            case 1: case 3: case 5: case 7:
+            case 8: case 10: case 12:
+                return 31;
+            case 4: case 6: case 9: case 11:
+                return 30;
+            case 2:
+                if (isLeapYear(year))
+                    return 29;
+                else
+                    return 28;
+        }
+        return 0;
+    }
 }

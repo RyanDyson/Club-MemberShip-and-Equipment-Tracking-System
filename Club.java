@@ -54,7 +54,7 @@ public class Club {
         return Equipment.getEquipmentById(equipmentId, allEquipment);
     }
 
-    public EquipmentSet borrowEquipment(String[] args, Member borrower) throws ExEquipmentNotFound, ExEquipmentSetAlreadyBorrowed, ExMemberAlreadyBorrowedSet {
+    public EquipmentSet borrowEquipment(String[] args, Member borrower) throws ExEquipmentNotFound, ExEquipmentSetAlreadyBorrowed, ExMemberAlreadyBorrowedSet, ExBorrowRequestPeriodOverlaps {
         Equipment e = findEquipment(args[2]);
         EquipmentSet borrowedSet = e.borrowEquipmentSets(args, borrower);
         return borrowedSet;
@@ -74,17 +74,33 @@ public class Club {
         }
     }
 
-    public void printBorrowedEquipmentSetByMember(Member m) {
+    public boolean printBorrowedEquipmentSetByMember(Member m) {
         boolean haveBorrowed = false;
         for (Equipment e: allEquipment) {
             EquipmentSet es = e.getBorrowedSetByMember(m);
             if (es != null) {
                 haveBorrowed = true;
-                System.out.println("- borrows " + es.toString() + " (" + e.getName() + ") for " + SystemDate.getInstance().clone().toString() + " to " + es.getReturnDate().toString());
+                System.out.println("- borrows " + es.toString() + " (" + e.getName() + ") for " + es.getBorrowDate().toString() + " to " + es.getReturnDate().toString());
             }
         }
-        if (!haveBorrowed) {
-            System.out.println("No record.");
+        return haveBorrowed;
+    }
+
+    public boolean printRequestedEquipmentByMember(Member requster) {
+        ArrayList<RequestPeriod> allRequests = new ArrayList<RequestPeriod>();
+        boolean haveRequested = false;
+        for (Equipment e: allEquipment) {
+            ArrayList<RequestPeriod> es = e.printRequestedSetByMember(requster);
+            if(es.size() > 0) {
+                haveRequested = true;
+                allRequests.addAll(es);
+            }
         }
+
+        Collections.sort(allRequests);
+        for (RequestPeriod rp: allRequests) {
+            System.out.println("- requests " + rp.requestedSet.toString() + " (" + rp.name + ") for " + rp.start.toString() + " to " + rp.end.toString());
+        }
+        return haveRequested;
     }
 }

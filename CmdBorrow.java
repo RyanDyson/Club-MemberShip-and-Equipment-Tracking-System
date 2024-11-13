@@ -4,10 +4,25 @@ public class CmdBorrow extends RecordedCommand {
     private String[] cmdParts;
 
     @Override
-    public void execute(String args[]) throws ExInsufficientArgument, ExMemberNotFound, ExMemberNotFound, ExEquipmentNotFound, ExEquipmentSetAlreadyBorrowed, ExMemberAlreadyBorrowedSet{
+    public void execute(String args[]) throws ExInsufficientArgument, ExMemberNotFound, ExMemberNotFound, ExEquipmentNotFound, ExEquipmentSetAlreadyBorrowed, ExMemberAlreadyBorrowedSet, ExNumberOfDaysLessThanOne, ExBorrowRequestPeriodOverlaps{
         cmdParts = args;
         if (cmdParts.length < 3) {
             throw new ExInsufficientArgument();
+        }
+        int numDays;
+        try {
+          numDays = Integer.parseInt(cmdParts[3]);
+        }
+        catch (ArrayIndexOutOfBoundsException e) {
+          numDays = 7;
+        }
+        catch (NumberFormatException e) {
+          System.out.println("Please provide an integer for the number of days.");
+          return;
+        }
+
+        if (numDays < 0 ) {
+          throw new ExNumberOfDaysLessThanOne();
         }
         String borrowerId = cmdParts[1];
         Club myClub = Club.getInstance();
@@ -52,6 +67,9 @@ public class CmdBorrow extends RecordedCommand {
             System.out.println(e.getMessage());
           }
           catch (ExMemberAlreadyBorrowedSet e) {
+            System.out.println(e.getMessage());
+          }
+          catch (ExBorrowRequestPeriodOverlaps e) {
             System.out.println(e.getMessage());
           }
           addUndoCommand(this);
