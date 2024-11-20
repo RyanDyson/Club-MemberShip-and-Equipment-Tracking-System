@@ -12,38 +12,51 @@ public class Equipment implements Comparable<Equipment> {
         Club.getInstance().addEquipment(this);
     }
 
-    public EquipmentSet borrowEquipmentSets(String[] args, Member borrower) throws ExEquipmentSetAlreadyBorrowed, ExMemberAlreadyBorrowedSet, ExBorrowRequestPeriodOverlaps{
-        for (EquipmentSet e: equipmentSet) {
-            if (!e.isAvailable()) {
-                if (e.getBorrower().equals(borrower)) {
-                    throw new ExMemberAlreadyBorrowedSet();
-                }
+    public EquipmentSet borrowEquipmentSets(String[] args, Member borrower) throws ExEquipmentSetAlreadyBorrowed, ExMemberAlreadyBorrowedSet, ExBorrowRequestPeriodOverlaps {
+        boolean hasAvailableSet = false;
+    
+        // Check if there are any available sets
+        for (EquipmentSet e : equipmentSet) {
+            if (e.isAvailable()) {
+                hasAvailableSet = true;
+                break;
             }
         }
+    
+        if (!hasAvailableSet) {
+            throw new ExEquipmentSetAlreadyBorrowed();
+        }
+    
+        // Check if the borrower has already borrowed a set
+        for (EquipmentSet e : equipmentSet) {
+            if (!e.isAvailable() && e.getBorrower().equals(borrower)) {
+                throw new ExMemberAlreadyBorrowedSet();
+            }
+        }
+    
         int borrowDays = (args.length >= 4) ? Integer.parseInt(args[3]) : 7;
-
         Day returnDate = SystemDate.getInstance().clone();
         EquipmentSet borrowedset = null;
         returnDate.addDays(borrowDays);
-
-        for (EquipmentSet e: equipmentSet) {
+    
+        for (EquipmentSet e : equipmentSet) {
             if (e.isAvailable()) {
                 try {
-                e.borrowSet(borrower, returnDate);
-                borrowedset = e;
-                break;
-                }
-                catch (ExBorrowRequestPeriodOverlaps e1) {
+                    e.borrowSet(borrower, returnDate);
+                    borrowedset = e;
+                    break;
+                } catch (ExBorrowRequestPeriodOverlaps e1) {
                     System.out.println(e1.getMessage());
                     return null;
                 }
             }
         }
-
+    
         if (borrowedset != null) {
             Collections.sort(equipmentSet);
             return borrowedset;
         }
+    
         throw new ExEquipmentSetAlreadyBorrowed();
     }
 
@@ -148,10 +161,7 @@ public class Equipment implements Comparable<Equipment> {
     public EquipmentSet requestSet(Member requester, Day start, Day end) throws ExBorrowRequestPeriodOverlaps, ExEquipmentSetAlreadyBorrowed {
         for (EquipmentSet e : equipmentSet) {
             for (RequestPeriod request : e.getAllRequests()) {
-                if (request.requester.equals(requester) &&
-                    ((start.compareTo(request.start) >= 0 && start.compareTo(request.end) <= 0) ||
-                     (end.compareTo(request.start) >= 0 && end.compareTo(request.end) <= 0) ||
-                     (start.compareTo(request.start) <= 0 && end.compareTo(request.end) >= 0))) {
+                if (request.getRequester().equals(requester) && (request.overlaps(start, end))) {
                     throw new ExBorrowRequestPeriodOverlaps("The period overlaps with a current period that the member borrows / requests the equipment.");
                 }
             }

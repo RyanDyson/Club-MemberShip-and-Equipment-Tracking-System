@@ -4,43 +4,66 @@ public class CmdBorrow extends RecordedCommand {
     private String[] cmdParts;
 
     @Override
-    public void execute(String args[]) throws ExInsufficientArgument, ExMemberNotFound, ExMemberNotFound, ExEquipmentNotFound, ExEquipmentSetAlreadyBorrowed, ExMemberAlreadyBorrowedSet, ExNumberOfDaysLessThanOne, ExBorrowRequestPeriodOverlaps{
-        cmdParts = args;
-        if (cmdParts.length < 3) {
-            throw new ExInsufficientArgument();
-        }
-        int numDays;
+    public void execute(String args[]){
         try {
-          numDays = Integer.parseInt(cmdParts[3]);
+          cmdParts = args;
+          if (cmdParts.length < 3) {
+              throw new ExInsufficientArgument();
+          }
+          int numDays;
+          try {
+            numDays = Integer.parseInt(cmdParts[3]);
+          }
+          catch (ArrayIndexOutOfBoundsException e) {
+            numDays = 7;
+          }
+          
+
+          if (numDays < 0 ) {
+            throw new ExNumberOfDaysLessThanOne();
+          }
+          String borrowerId = cmdParts[1];
+          Club myClub = Club.getInstance();
+          Equipment equipment = null;
+
+          borrower = myClub.findMember(borrowerId);
+          equipment = myClub.findEquipment(cmdParts[2]);
+        
+          if (borrower != null) {
+            equipmentSet = myClub.borrowEquipment(cmdParts, borrower);
+            if (equipmentSet != null && equipment != null) {
+                borrower.borrowEquipmentSet();
+                addUndoCommand(this);
+                clearRedoList();
+                System.out.println(borrower.toString() + " borrows " + equipmentSet.toString() + " (" + equipment.getName() + ") for " + SystemDate.getInstance().clone().toString() + " to " + equipmentSet.getReturnDate().toString());
+                System.out.println("Done.");
+            }
+          }
         }
-        catch (ArrayIndexOutOfBoundsException e) {
-          numDays = 7;
+        catch (ExInsufficientArgument e) {
+          System.out.println(e.getMessage());  
+        }
+        catch (ExMemberNotFound e ) {
+          System.out.println(e.getMessage());
+        }
+        catch (ExEquipmentNotFound e) {
+          System.out.println(e.getMessage());
+        }
+        catch (ExEquipmentSetAlreadyBorrowed e) {
+          System.out.println(e.getMessage());
+        }
+        catch (ExMemberAlreadyBorrowedSet e) {
+          System.out.println(e.getMessage());
+        }
+        catch (ExNumberOfDaysLessThanOne e) {
+          System.out.println(e.getMessage());
+        }
+        catch (ExBorrowRequestPeriodOverlaps e) {
+          System.out.println(e.getMessage());
         }
         catch (NumberFormatException e) {
           System.out.println("Please provide an integer for the number of days.");
-          return;
         }
-
-        if (numDays < 0 ) {
-          throw new ExNumberOfDaysLessThanOne();
-        }
-        String borrowerId = cmdParts[1];
-        Club myClub = Club.getInstance();
-        Equipment equipment = null;
-
-        borrower = myClub.findMember(borrowerId);
-        equipment = myClub.findEquipment(cmdParts[2]);
-      
-        if (borrower != null) {
-          equipmentSet = myClub.borrowEquipment(cmdParts, borrower);
-          if (equipmentSet != null && equipment != null) {
-              borrower.borrowEquipmentSet();
-              addUndoCommand(this);
-              clearRedoList();
-              System.out.println(borrower.toString() + " borrows " + equipmentSet.toString() + " (" + equipment.getName() + ") for " + SystemDate.getInstance().clone().toString() + " to " + equipmentSet.getReturnDate().toString());
-              System.out.println("Done.");
-          }
-        }    
     }
 
     @Override

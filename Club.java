@@ -99,7 +99,7 @@ public class Club {
 
         Collections.sort(allRequests);
         for (RequestPeriod rp: allRequests) {
-            System.out.println("- requests " + rp.requestedSet.toString() + " (" + rp.name + ") for " + rp.start.toString() + " to " + rp.end.toString());
+            System.out.println(rp.memberReqeuststatus());
         }
         return haveRequested;
     }

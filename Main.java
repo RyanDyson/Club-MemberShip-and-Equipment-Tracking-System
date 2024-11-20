@@ -29,72 +29,38 @@ public class Main {
 				System.out.println("\n> "+cmdLine);
 				
 				String[] cmdParts = cmdLine.split(" "); 
+				if (cmdParts[0].equals("register"))
+					(new CmdRegister()).execute(cmdParts);
+				else if (cmdParts[0].equals("listMembers"))
+					(new CmdListMembers()).execute(cmdParts);
+				else if (cmdParts[0].equals("startNewDay"))
+					(new CmdStartNewDay()).execute(cmdParts);
+				else if (cmdParts[0].equals("create"))
+					(new CmdCreate()).execute(cmdParts);
+				else if (cmdParts[0].equals("arrive")) 
+					(new CmdArrive()).execute(cmdParts);
+				else if (cmdParts[0].equals("borrow")) 
+					(new CmdBorrow()).execute(cmdParts);
+				else if (cmdParts[0].equals("listEquipment"))
+					(new CmdListEquipment()).execute(cmdParts);
+				else if (cmdParts[0].equals("listMemberStatus"))
+					(new CmdListMemberStatus()).execute(cmdParts);	
+				else if (cmdParts[0].equals("listEquipmentStatus"))
+					(new CmdListEquipmentStatus()).execute(cmdParts);
+				else if (cmdParts[0].equals("request"))
+					(new CmdRequest()).execute(cmdParts);
+				else if (cmdParts[0].equals("undo"))
+					RecordedCommand.undoOneCommand();
+				else if (cmdParts[0].equals("redo"))
+					RecordedCommand.redoOneCommand();
+				else {
+					throw new ExUnknownCommand();
+				}
 				
-				try {
-					if (cmdParts[0].equals("register"))
-						(new CmdRegister()).execute(cmdParts);
-					else if (cmdParts[0].equals("listMembers"))
-						(new CmdListMembers()).execute(cmdParts);
-					else if (cmdParts[0].equals("startNewDay"))
-						(new CmdStartNewDay()).execute(cmdParts);
-					else if (cmdParts[0].equals("create"))
-						(new CmdCreate()).execute(cmdParts);
-					else if (cmdParts[0].equals("arrive")) 
-						(new CmdArrive()).execute(cmdParts);
-					else if (cmdParts[0].equals("borrow")) 
-						(new CmdBorrow()).execute(cmdParts);
-					else if (cmdParts[0].equals("listEquipment"))
-						(new CmdListEquipment()).execute(cmdParts);
-					else if (cmdParts[0].equals("listMemberStatus"))
-						(new CmdListMemberStatus()).execute(cmdParts);	
-					else if (cmdParts[0].equals("listEquipmentStatus"))
-						(new CmdListEquipmentStatus()).execute(cmdParts);
-					else if (cmdParts[0].equals("request"))
-						(new CmdRequest()).execute(cmdParts);
-					else if (cmdParts[0].equals("undo"))
-						RecordedCommand.undoOneCommand();
-					else if (cmdParts[0].equals("redo"))
-						RecordedCommand.redoOneCommand();
-					else {
-						throw new ExUnknownCommand();
-					}
-				}
-				catch (ExBorrowRequestPeriodOverlaps e) {
-					System.out.println(e.getMessage());
-				}
-				catch (ExInsufficientArgument e) {
-					System.out.println(e.getMessage());
-				}
-				catch (ExEquipmentNotFound e) {
-					System.out.println(e.getMessage());
-				}
-				catch (ExMemberIdInUse e) {
-					System.out.println(e.getMessage());
-				}
-				catch (ExInvalidDateFormat e) {
-					System.out.println(e.getMessage());
-				}
-				catch (ExEquipmentCodeInUse e) {
-					System.out.println(e.getMessage());
-				}
-				catch (ExMemberNotFound e) {
-					System.out.println(e.getMessage());
-				}
-				catch (ExEquipmentSetAlreadyBorrowed e) {
-					System.out.println(e.getMessage());
-				}
-				catch (ExMemberAlreadyBorrowedSet e) {
-					System.out.println(e.getMessage());
-				}
-				catch (ExNumberOfDaysLessThanOne e) {
-					System.out.println(e.getMessage());
-				}
-				catch (ExUnknownCommand e) {
-					System.out.println(e.getMessage());
-					System.exit(0);
-				}
-				finally {}
 			}
+		}
+		catch (ExUnknownCommand e) {
+			System.out.println(e.getMessage());
 		}
 		catch (FileNotFoundException e) {
 			System.out.println("File not found!");

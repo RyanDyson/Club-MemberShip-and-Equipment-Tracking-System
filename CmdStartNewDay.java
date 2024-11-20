@@ -4,23 +4,31 @@ public class CmdStartNewDay extends RecordedCommand{
     private Day prevDate;
 
     @Override
-    public void execute(String[] cmdParts) throws ExInsufficientArgument, ExInvalidDateFormat {
-        if (cmdParts.length < 2) {
-            throw new ExInsufficientArgument();
+    public void execute(String[] cmdParts) {
+        try {
+            if (cmdParts.length < 2) {
+                throw new ExInsufficientArgument();
+            }
+
+            String newDate = cmdParts[1];
+            newDatee = new Day(newDate);
+            prevDate = date.clone();
+            if (newDatee.compareTo(date) < 0) {
+                throw new ExInvalidDateFormat("Invalid new day.  The new day has to be later than the current date " + date.toString() + ".");
+            }
+
+            date.set(newDate);
+
+            addUndoCommand(this);
+            clearRedoList();
+            System.out.println("Done. ");
         }
-
-        String newDate = cmdParts[1];
-        newDatee = new Day(newDate);
-        prevDate = date.clone();
-        if (newDatee.compareTo(date) < 0) {
-            throw new ExInvalidDateFormat("Invalid new day.  The new day has to be later than the current date " + date.toString() + ".");
+        catch (ExInsufficientArgument e) {
+            System.out.println(e.getMessage());
         }
-
-        date.set(newDate);
-
-        addUndoCommand(this);
-        clearRedoList();
-        System.out.println("Done. ");
+        catch (ExInvalidDateFormat e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @Override

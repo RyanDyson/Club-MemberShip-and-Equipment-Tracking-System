@@ -29,19 +29,17 @@ public class EquipmentSet implements Comparable<EquipmentSet> {
         if (days.length == 0) {
             return isAvailable;
         } else {
-            Day requestStart = days[0];
-            Day requestEnd = days[1];
-            if (requestStart == null || requestEnd == null) {
-                throw new NullPointerException("requestStart or requestEnd is null");
+            Day start = days[0];
+            Day end = days[1];
+            if (start == null || end == null) {
+                throw new NullPointerException("start or end is null");
             }
-            if (requestStart.compareTo(returnDate) < 0) {
+            if (start.compareTo(returnDate) < 0) {
                 return false;
             }
             if (allRequests.size() > 0) {
                 for (RequestPeriod prevRequest : allRequests) {
-                    if ((requestStart.compareTo(prevRequest.start) >= 0 && requestStart.compareTo(prevRequest.end) <= 0) ||
-                        (requestEnd.compareTo(prevRequest.start) >= 0 && requestEnd.compareTo(prevRequest.end) <= 0) ||
-                        (requestStart.compareTo(prevRequest.start) <= 0 && requestEnd.compareTo(prevRequest.end) >= 0)) {
+                    if (prevRequest.overlaps(start, end)) {
                         return false;
                     }
                 }
@@ -51,12 +49,10 @@ public class EquipmentSet implements Comparable<EquipmentSet> {
     }    
 
     public void borrowSet(Member member, Day date ) throws ExBorrowRequestPeriodOverlaps {
-        Day currDay = SystemDate.getInstance().clone();
         if (allRequests.size() > 0) {
             for (RequestPeriod prevRequest : allRequests) {
-                if ((currDay.compareTo(prevRequest.start) >= 0 && currDay.compareTo(prevRequest.end) <= 0) ||
-                (date.compareTo(prevRequest.start) >= 0 && date.compareTo(prevRequest.end) <= 0) ||
-                (currDay.compareTo(prevRequest.start) <= 0 && date.compareTo(prevRequest.end) >= 0)) {
+                Day currDay = SystemDate.getInstance().clone();
+                if (prevRequest.overlaps(currDay, date)) {
                     throw new ExBorrowRequestPeriodOverlaps();
                 }
             }
@@ -105,7 +101,7 @@ public class EquipmentSet implements Comparable<EquipmentSet> {
                 if (i > 0) {
                     System.out.print(", ");
                 }
-                System.out.print(prevRequest.start.toString() + " to " + prevRequest.end.toString());
+                System.out.print(prevRequest.toString());
                 i++;
             }
             System.out.println();
@@ -125,19 +121,12 @@ public class EquipmentSet implements Comparable<EquipmentSet> {
         }
         if (allRequests.size() > 0) {
             for (RequestPeriod prevRequest : allRequests) {
-                if ((start.compareTo(prevRequest.start) >= 0 && start.compareTo(prevRequest.end) <= 0) ||
-                    (end.compareTo(prevRequest.start) >= 0 && end.compareTo(prevRequest.end) <= 0) ||
-                    (start.compareTo(prevRequest.start) <= 0 && end.compareTo(prevRequest.end) >= 0)) {
+                if (prevRequest.overlaps(start, end)) {
                     throw new ExBorrowRequestPeriodOverlaps("The period overlaps with a current period that the member borrows / requests the equipment.");
                 }
             }
         }
-        RequestPeriod newRequest = new RequestPeriod();
-        newRequest.start = start;
-        newRequest.end = end;
-        newRequest.requester = requester;
-        newRequest.requestedSet = this;
-        newRequest.name = equipment.getName();
+        RequestPeriod newRequest = new RequestPeriod(start, end, requester, this, equipment.getName());
         allRequests.add(newRequest);
         Collections.sort(allRequests);
         return this;
@@ -146,7 +135,7 @@ public class EquipmentSet implements Comparable<EquipmentSet> {
     public ArrayList<RequestPeriod> getRequestsByMember(Member requester) {
         ArrayList<RequestPeriod> requestsByMember = new ArrayList<RequestPeriod>();
         for (RequestPeriod prevRequest : allRequests) {
-            if (prevRequest.requester.equals(requester)) {
+            if (prevRequest.getRequester().equals(requester)) {
                 requestsByMember.add(prevRequest);
             }
         }
@@ -155,7 +144,7 @@ public class EquipmentSet implements Comparable<EquipmentSet> {
 
     public void cancelRequest(Member requester, Day start, Day end) {
         for (RequestPeriod prevRequest : allRequests) {
-            if (prevRequest.requester.equals(requester) && prevRequest.start.equals(start) && prevRequest.end.equals(end)) {
+            if (prevRequest.getRequester().equals(requester) && prevRequest.getStart().equals(start) && prevRequest.getEnd().equals(end)) {
                 allRequests.remove(prevRequest);
                 return;
             }

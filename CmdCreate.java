@@ -3,28 +3,36 @@ public class CmdCreate extends RecordedCommand{
     private Equipment newEquipment;
 
     @Override
-    public void execute(String[] cmdParts) throws ExInsufficientArgument, ExEquipmentCodeInUse {
-        if (cmdParts.length < 3) {
-            throw new ExInsufficientArgument();
-        }
-        String EquipmentCode = cmdParts[1];
-        Equipment e;
+    public void execute(String[] cmdParts) {
         try {
-            e = myClub.findEquipment(EquipmentCode);
-        }
-        catch (ExEquipmentNotFound e1) {
-            e = null;
-        }
+            if (cmdParts.length < 3) {
+                throw new ExInsufficientArgument();
+            }
+            String EquipmentCode = cmdParts[1];
+            Equipment e;
+            try {
+                e = myClub.findEquipment(EquipmentCode);
+            }
+            catch (ExEquipmentNotFound e1) {
+                e = null;
+            }
 
-        if (e != null) {
-            throw new ExEquipmentCodeInUse(e);
+            if (e != null) {
+                throw new ExEquipmentCodeInUse(e);
+            }
+            else {
+                String Name = cmdParts[2];
+                newEquipment = new Equipment(EquipmentCode, Name);
+                System.out.println("Done.");
+                addUndoCommand(this);
+                clearRedoList();
+            }
         }
-        else {
-            String Name = cmdParts[2];
-            newEquipment = new Equipment(EquipmentCode, Name);
-            System.out.println("Done.");
-            addUndoCommand(this);
-            clearRedoList();
+        catch (ExInsufficientArgument e) {
+            System.out.println(e.getMessage());
+        }
+        catch (ExEquipmentCodeInUse e) {
+            System.out.println(e.getMessage());
         }
     }
 

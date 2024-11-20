@@ -20,4 +20,8 @@ public class SystemDate extends Day {
     public void set(String sDay) throws ExInvalidDateFormat {
         super.set(sDay);
     }
+
+    public Day clone() {
+        return super.clone();
+    }
 }
