@@ -1,0 +1,19 @@
+startNewDay 03-Jan-2024
+
+register 001 helena 
+register 002 jason
+
+create E1 3D_Scanner
+arrive E1
+borrow 001 E1
+
+startNewDay 06-Jan-2024
+request 002 E1 07-Jan-2024 2
+request 002 E1 07-Jan-2024 12
+
+listEquipment
+listMembers
+
+listEquipmentStatus
+listMemberStatus
+
