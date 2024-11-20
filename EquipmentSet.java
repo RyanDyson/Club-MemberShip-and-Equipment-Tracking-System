@@ -37,11 +37,9 @@ public class EquipmentSet implements Comparable<EquipmentSet> {
             if (start.compareTo(returnDate) < 0) {
                 return false;
             }
-            if (allRequests.size() > 0) {
-                for (RequestPeriod prevRequest : allRequests) {
-                    if (prevRequest.overlaps(start, end)) {
-                        return false;
-                    }
+            for (RequestPeriod prevRequest : allRequests) {
+                if (prevRequest.overlaps(start, end)) {
+                    return false;
                 }
             }
             return true;

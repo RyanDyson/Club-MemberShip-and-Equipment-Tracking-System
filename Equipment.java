@@ -15,19 +15,6 @@ public class Equipment implements Comparable<Equipment> {
     public EquipmentSet borrowEquipmentSets(String[] args, Member borrower) throws ExEquipmentSetAlreadyBorrowed, ExMemberAlreadyBorrowedSet, ExBorrowRequestPeriodOverlaps {
         boolean hasAvailableSet = false;
     
-        // Check if there are any available sets
-        for (EquipmentSet e : equipmentSet) {
-            if (e.isAvailable()) {
-                hasAvailableSet = true;
-                break;
-            }
-        }
-    
-        if (!hasAvailableSet) {
-            throw new ExEquipmentSetAlreadyBorrowed();
-        }
-    
-        // Check if the borrower has already borrowed a set
         for (EquipmentSet e : equipmentSet) {
             if (!e.isAvailable() && e.getBorrower().equals(borrower)) {
                 throw new ExMemberAlreadyBorrowedSet();
@@ -35,20 +22,28 @@ public class Equipment implements Comparable<Equipment> {
         }
     
         int borrowDays = (args.length >= 4) ? Integer.parseInt(args[3]) : 7;
-        Day returnDate = SystemDate.getInstance().clone();
-        EquipmentSet borrowedset = null;
+        Day currDate = SystemDate.getInstance().clone();
+        Day returnDate = currDate.clone();
         returnDate.addDays(borrowDays);
-    
+
+        for (EquipmentSet e : equipmentSet) {
+            if (e.isAvailable(currDate, returnDate)) {
+                hasAvailableSet = true;
+                break;
+            }
+        }
+
+        if (!hasAvailableSet) {
+            throw new ExEquipmentSetAlreadyBorrowed();
+        }
+
+        EquipmentSet borrowedset = null;
+
         for (EquipmentSet e : equipmentSet) {
             if (e.isAvailable()) {
-                try {
-                    e.borrowSet(borrower, returnDate);
-                    borrowedset = e;
-                    break;
-                } catch (ExBorrowRequestPeriodOverlaps e1) {
-                    System.out.println(e1.getMessage());
-                    return null;
-                }
+                e.borrowSet(borrower, returnDate);
+                borrowedset = e;
+                break;
             }
         }
     

@@ -1,5 +1,6 @@
 public class CmdBorrow extends RecordedCommand {
     private EquipmentSet equipmentSet;
+    private Equipment equipment;
     private Member borrower;
     private String[] cmdParts;
 
@@ -24,13 +25,12 @@ public class CmdBorrow extends RecordedCommand {
           }
           String borrowerId = cmdParts[1];
           Club myClub = Club.getInstance();
-          Equipment equipment = null;
 
           borrower = myClub.findMember(borrowerId);
           equipment = myClub.findEquipment(cmdParts[2]);
         
           if (borrower != null) {
-            equipmentSet = myClub.borrowEquipment(cmdParts, borrower);
+            equipmentSet = myClub.borrowEquipment(cmdParts, borrower, equipment);
             if (equipmentSet != null && equipment != null) {
                 borrower.borrowEquipmentSet();
                 addUndoCommand(this);
@@ -81,7 +81,7 @@ public class CmdBorrow extends RecordedCommand {
           borrower.borrowEquipmentSet();
           Club myClub = Club.getInstance();
           try {
-            myClub.borrowEquipment(cmdParts, borrower);
+            myClub.borrowEquipment(cmdParts, borrower, equipment);
           }
           catch (ExEquipmentNotFound e) {
             System.out.println(e.getMessage());

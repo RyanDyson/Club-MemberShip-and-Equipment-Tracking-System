@@ -54,8 +54,7 @@ public class Club {
         return Equipment.getEquipmentById(equipmentId, allEquipment);
     }
 
-    public EquipmentSet borrowEquipment(String[] args, Member borrower) throws ExEquipmentNotFound, ExEquipmentSetAlreadyBorrowed, ExMemberAlreadyBorrowedSet, ExBorrowRequestPeriodOverlaps {
-        Equipment e = findEquipment(args[2]);
+    public EquipmentSet borrowEquipment(String[] args, Member borrower, Equipment e) throws ExEquipmentNotFound, ExEquipmentSetAlreadyBorrowed, ExMemberAlreadyBorrowedSet, ExBorrowRequestPeriodOverlaps {
         EquipmentSet borrowedSet = e.borrowEquipmentSets(args, borrower);
         return borrowedSet;
     }
